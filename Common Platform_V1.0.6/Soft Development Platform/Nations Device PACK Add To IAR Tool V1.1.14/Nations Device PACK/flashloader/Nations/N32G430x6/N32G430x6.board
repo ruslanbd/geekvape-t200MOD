@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<flash_board>
+  <pass>
+    <loader>$TOOLKIT_DIR$\config\flashloader\Nations\N32G430x6\N32G430x6.flash</loader>
+    <range>CODE 0x8000000 0x8007fff</range>
+  </pass>
+</flash_board>
+
+

@@ -1,0 +1,5 @@
+r
+loadfile build/output.hex
+r
+g
+qc

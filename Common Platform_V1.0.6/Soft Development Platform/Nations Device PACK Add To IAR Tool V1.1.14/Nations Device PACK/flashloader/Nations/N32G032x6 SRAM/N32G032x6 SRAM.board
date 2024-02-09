@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<flash_board>
+  <pass>
+    <loader>$TOOLKIT_DIR$\config\flashloader\Nations\N32G032x6 SRAM\N32G032x6 SRAM.flash</loader>
+    <range>CODE 0x20001000 0x20003fff</range>
+  </pass>
+</flash_board>
+
+

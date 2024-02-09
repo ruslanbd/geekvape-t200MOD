@@ -1,0 +1,16 @@
+; I-jet script file for Nations N32 (Cortex-M) series devices
+return ; End of default action
+
+;-------------------------------------------------
+; Routines
+
+:ConnectUnderReset [reset_default:9] ; Connect during reset
+    emu JtagHeader=reset:0 ; assert reset active
+    s32 0xE000EDFC |= 1
+    emu JtagHeader=reset:1 ; deassert reset
+    emu JtagHeader=reset:r ; deassert reset
+    emu JtagHeader=reset:c ; deassert reset
+    reset system
+    return
+    
+; End of file "N32.ProbeScript"

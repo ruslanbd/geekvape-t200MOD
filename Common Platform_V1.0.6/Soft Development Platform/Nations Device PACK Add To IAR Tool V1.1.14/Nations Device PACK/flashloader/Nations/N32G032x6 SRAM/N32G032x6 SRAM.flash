@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<flash_device>
+  <exe>$TOOLKIT_DIR$\config\flashloader\Nations\N32G032x6 SRAM\N32G032x6 SRAM.out</exe>
+  <page>2</page>
+  <block>64 0x200</block>
+  <flash_base>0x20001000</flash_base>
+  <macro>$TOOLKIT_DIR$\config\flashloader\Nations\N32G032x6 SRAM\N32G032x6 SRAM.mac</macro>
+  <online>1</online>
+  <aggregate>1</aggregate>
+  <args_doc>"--skip_erase" -Don't erase blocks that read empty.</args_doc>
+</flash_device>

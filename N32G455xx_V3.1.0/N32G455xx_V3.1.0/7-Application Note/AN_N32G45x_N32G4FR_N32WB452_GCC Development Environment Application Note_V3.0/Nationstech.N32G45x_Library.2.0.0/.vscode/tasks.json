@@ -1,0 +1,27 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "make_debug",
+			"command": "make debug &",
+			//"isBackground": true,
+			"options": {
+				"cwd": "${workspaceFolder}/projects/n32g45x_EVAL/examples/GPIO/LedBlink/GCC"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+		},
+		{
+			"label": "build",
+			"dependsOn": [
+				"make_debug"
+			]
+		}
+	]
+}

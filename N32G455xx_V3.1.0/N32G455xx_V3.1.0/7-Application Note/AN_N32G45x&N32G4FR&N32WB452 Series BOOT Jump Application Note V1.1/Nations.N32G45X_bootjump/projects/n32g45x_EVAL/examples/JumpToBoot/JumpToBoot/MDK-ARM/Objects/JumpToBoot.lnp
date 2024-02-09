@@ -1,0 +1,15 @@
+--cpu=Cortex-M4.fp.sp
+".\objects\startup_n32g45x.o"
+".\objects\system_n32g45x.o"
+".\objects\n32g45x_flash.o"
+".\objects\n32g45x_gpio.o"
+".\objects\n32g45x_iwdg.o"
+".\objects\n32g45x_rcc.o"
+".\objects\n32g45x_usart.o"
+".\objects\main.o"
+".\objects\n32g45x_it.o"
+".\objects\bsp_usart.o"
+--library_type=microlib --strict --scatter ".\Objects\JumpToBoot.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\Listings\JumpToBoot.map" -o .\Objects\JumpToBoot.axf

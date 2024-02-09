@@ -1,0 +1,30 @@
+;; Architecture extensions
+;;#include weak "..\..\ARM\ARMv7-M-ETM.ddf"
+#include weak "..\..\ARM\ARMv7-M-TPIU.ddf"
+#include weak "..\..\ARM\ARMv7-M-MPU.ddf"
+
+;; Memory information ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 
+;; Used to define address zones within the ARM address space (Memory). 
+;;
+;;   Name      may be almost anything
+;;   AdrSpace  must be Memory
+;;   StartAdr  start of memory block
+;;   EndAdr    end of memory block
+;;   AccType   type of access, read-only (R), read-write (RW) or SFR (W)
+
+[Memory]
+;;         Name             AdrSpace    StartAdr    EndAdr      AccType   Width
+Memory =  RemapMem         Memory      0x00000000  0x000075FF  R 
+Memory =  Flash            Memory      0x08000000  0x080075FF  R 
+Memory =  OptionsROM       Memory      0x1FFFF600  0x1FFFF7FF  R  
+Memory =  RAM              Memory      0x20000000  0x20000BFF  RW
+Memory =  PeriphAPB        Memory      0x40000000  0x400073FF  RW 
+Memory =  PeriphAHB        Memory      0x40020000  0x400233FF  RW 
+Memory =  SystemSFR        Memory      0xE0000000  0xE00FFFFF  W 
+
+TrustedRanges = true
+UseSfrFilter = true
+
+[SfrInclude]
+File = N32G003.svd

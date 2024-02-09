@@ -1,0 +1,97 @@
+__var RCC_CFGR;
+__var RCC_CR;
+__var RCC_CIR;
+__var IWDG_PR;
+__var IWDG_RLR;
+
+execUserFlashInit()
+{
+  // Stop WDT when CPU is halted
+  __writeMemory32(__readMemory32(0xE0042004, "Memory") | 0x300, 0xE0042004, "Memory");
+
+  RCC_CFGR = __readMemory32(0x40021004, "Memory");
+  RCC_CR   = __readMemory32(0x40021000, "Memory");
+  RCC_CIR  = __readMemory32(0x40021008, "Memory");
+  
+  __writeMemory32(0x00000000, 0x40021004, "Memory"); // RCC_CFGR = 0
+  __writeMemory32(0x00000000, 0x40021008, "Memory"); // RCC_CIR  = 0;
+
+  //Check if hardware watchdog is enabled
+  if(!(0x4 & __readMemory32(0x4002201C,"Memory")))
+  {
+    // wait PVU reset
+    while(0x1 & __readMemory32(0x4000300C,"Memory"));
+    IWDG_PR  = __readMemory32(0x40003004, "Memory");
+    // wait RVU reset
+    while(0x2 & __readMemory32(0x4000300C,"Memory"));
+    IWDG_RLR = __readMemory32(0x40003008, "Memory");
+  
+    // unlock WDT registers
+    __writeMemory32(0x5555,0x40003000,"Memory");
+    //Prescaler
+    __writeMemory32(0x7,0x40003004,"Memory");
+    //Reload
+    __writeMemory32(0xFFF,0x40003008,"Memory");
+    // reload WDT
+    __writeMemory32(0xAAAA,0x40003000,"Memory");
+  }
+
+  //Check if readout protection is enabled
+  if (0x2 & __readMemory32(0x4002201C,"Memory")) 
+  {
+    if (!__messageBoxYesCancel("Do you want to perform mass erase to unlock the device?", "Unlocking device"))
+    {
+      __abortLaunch("Unlock cancelled. Debug session cannot continue.");
+    }
+    
+    //Bank 0
+    __writeMemory32(0x45670123, 0x40022004, "Memory"); // FLASH->FKEYR = FLASH_KEY1;
+    __writeMemory32(0xCDEF89AB, 0x40022004, "Memory"); // FLASH->FKEYR = FLASH_KEY2;
+
+    // Check if XL device with two flash banks
+    if ((__readMemory32(0xE0042000, "Memory") & 0xFFF) == 0x430)
+    {
+      //Bank 1
+      __writeMemory32(0x45670123, 0x40022044, "Memory"); // FLASH->FKEYR = FLASH_KEY1;
+      __writeMemory32(0xCDEF89AB, 0x40022044, "Memory"); // FLASH->FKEYR = FLASH_KEY2;
+    }  
+    
+    __writeMemory32(0x0, 0x40022000, "Memory"); // Flash 0 wait state
+    
+    __writeMemory32(0x45670123, 0x40022008, "Memory"); // FLASH->OPTKEYR = FLASH_OPTKEY1;
+    __writeMemory32(0xCDEF89AB, 0x40022008, "Memory"); // FLASH->OPTKEYR = FLASH_OPTKEY2;
+    __writeMemory32(0x00000220, 0x40022010, "Memory"); // Option byte erase
+    __writeMemory32(0x00000260, 0x40022010, "Memory"); // Start operation
+    
+    while(0x1 & __readMemory32(0x4002200C,"Memory"));  // Wait while FLASH busy
+    
+    __writeMemory32(0x00000210, 0x40022010, "Memory"); // Option byte programming
+    __writeMemory16(0x5AA5, 0x1FFFF800, "Memory");
+    
+    while(0x1 & __readMemory32(0x4002200C,"Memory"))
+    {
+      __delay(100);
+    }  // Wait while FLASH busy
+      
+    __message "Reset FLASH readout protection";
+
+    //Perform a reset so the option bytes are reloaded
+    __hwReset(0);         
+  }
+}
+
+execUserFlashExit()
+{
+  if(!(0x4 & __readMemory32(0x4002201C,"Memory")))
+  {
+    __writeMemory32(0x5555,0x40003000,"Memory");
+    __writeMemory32(IWDG_PR,0x40003004,"Memory");
+    __writeMemory32(IWDG_RLR,0x40003008,"Memory");
+    __writeMemory32(0xAAAA,0x40003000,"Memory");
+  }
+  
+  //Restore registers modified earlier
+  __writeMemory32(RCC_CFGR, 0x40021004, "Memory");
+  __writeMemory32(RCC_CR, 0x40021000, "Memory");
+  __writeMemory32(RCC_CIR, 0x40021008, "Memory");
+}

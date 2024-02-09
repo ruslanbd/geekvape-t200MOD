@@ -1,0 +1,43 @@
+﻿V1.0.7 
+整合N32G45X、N32G4FR、N32WB452、N32G43X、N32L43X、N32L40X、N32G032、N32G031、N32G030、N32G430系列资料，后续统一管理
+
+V1.0.9 
+增加N32G435T8Q7
+
+V1.0.10
+文档内容校对及格式调整
+
+V1.0.11
+增加N32A455系列
+
+V1.0.12
+增加N32G003、N32G401、N32G401F8S7_1系列
+
+V1.0.13
+增加N32A032、N32A430系列;优化N32G43X、N32L43X、N32L40X下载算法
+
+V1.0.14
+增加N32G451、N32G401系列、N32L402、N32G003F4系列
+
+-----------------------------------------------------------------------------------------------------------
+
+V1.0.7 
+Merge and organize N32G45X,N32G4FR,N32WB452,N32G43X,N32L43X,N32L40X,N32G032,N32G031,N32G030,N32G430 series, unified management later
+
+V1.0.9 
+add  N32G435T8Q7
+
+V1.0.10
+document content proofreading，format adjustment
+
+V1.0.11
+add N32A455 series
+
+V1.0.12
+add N32G003\N32G401\N32G401F8S7_1 series
+
+V1.0.13
+add N32A032\N32A430 series;Optimized N32G43X\N32L43X\N32L40X series download algorithm
+
+V1.0.14
+add N32G451,N32G401, N32L402, N32G003F4 series

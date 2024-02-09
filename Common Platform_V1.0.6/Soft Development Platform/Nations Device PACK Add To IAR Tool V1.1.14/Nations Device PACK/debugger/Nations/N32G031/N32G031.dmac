@@ -1,0 +1,235 @@
+// N32G031 utility macros
+
+execConfigureTraceETM()
+{
+    __var data;
+
+    data = __readMemory32(0xE0042004, "Memory");
+
+    data &= ~0xE0;
+  
+    if ( __getTracePortSize() == 1 )
+    {
+        data |= 0x60; // bit 7,6,5  TRACE_MODE=01 TRACE_IOEN=1
+    } 
+    else
+    if ( __getTracePortSize() == 2 )
+    {
+        data |= 0xA0; // bit 7,6,5  TRACE_MODE=10 TRACE_IOEN=1
+    } 
+    else   
+    {
+        data |= 0xE0; // bit 7,6,5  TRACE_MODE=11 TRACE_IOEN=1
+    }
+    
+    __writeMemory32(data, 0xE0042004, "Memory");
+}
+
+execConfigureTraceSWO()
+{
+  __var value;
+  
+  value = __readMemory32(0xE0042004, "Memory");
+  value &= ~0xE0;
+  value |= 0x20;  // bit 7,6,5  TRACE_MODE=00 TRACE_IOEN=1
+  __writeMemory32(value, 0xE0042004, "Memory");
+
+}
+
+_ExecDeviceExecutionStarted()
+{
+    if (__driverType("jet"))
+    {  
+         __var dbg_ctl;
+
+        dbg_ctl = __readMemory32(0x40007030, "Memory");
+
+        if ((dbg_ctl & 0x6) != 0x6)
+        {
+      
+            dbg_ctl |= 6; 
+      
+            __writeMemory32(dbg_ctl, 0x40007030, "Memory");
+            __message "DBG_CTL standby stop powerdown-mode in debugging";
+        }
+    }
+}
+
+Flash_unlock()
+{
+    __var rcc_ctrl;
+	rcc_ctrl = __readMemory32(0x40021000,"Memory");
+	rcc_ctrl |= 1;
+    __writeMemory32(rcc_ctrl, 0x40021000, "Memory"); // RCC->CTRL |= RCC_CTRL_HSIEN;
+	while((0x2 & __readMemory32(0x40021000,"Memory")) != 0x2)
+	{}
+	
+	if(0x80 & __readMemory32(0x40022010,"Memory"))
+    {
+        __message "Unlock flash";
+    
+        __writeMemory32(0x45670123, 0x40022004, "Memory"); // FLASH_KEY = FLASH_KEY1;
+        __writeMemory32(0xCDEF89AB, 0x40022004, "Memory"); // FLASH_KEY = FLASH_KEY2;
+        __writeMemory32(0xFFFFFFF8 & __readMemory32(0x40022000,"Memory"), 0x40022000, "Memory"); 
+
+    }
+    else
+    {
+        __message "FLASH have been unlocked";
+    }
+
+}
+
+
+Flash_lock()
+{
+  
+    if(!(0x80 & __readMemory32(0x40022010,"Memory")))
+    {
+        __message "Lock flash";
+    
+        __var ctl;
+        ctl = __readMemory32(0x40022010,"Memory");
+    
+        __writeMemory32(ctl | 0x80, 0x40022010, "Memory"); 
+  
+    }
+    else
+    {
+        __message "Flash have been locked";
+    }
+
+}
+
+Enable_set_OptionBytes()
+{
+
+    if(!(0x200 & __readMemory32(0x40022010,"Memory")))
+    {
+  
+        Flash_unlock();
+  
+        __writeMemory32(0x45670123, 0x40022008, "Memory"); // FLASH_OPTKEY = FLASH_OPTKEY1;
+        __writeMemory32(0xCDEF89AB, 0x40022008, "Memory"); // FLASH_OPTKEY = FLASH_OPTKEY2; 
+    
+    
+        __message "Enable Option bytes";
+  
+    }
+
+}
+
+
+Enable_readProtection()
+{
+    if ((0x2 & __readMemory32(0x4002201C,"Memory")) == 0)
+    {
+  
+        Enable_set_OptionBytes();
+    
+        __message "Set readout protection";
+    
+        __writeMemory32(0x00000220, 0x40022010, "Memory"); 
+        __writeMemory32(0x00000260, 0x40022010, "Memory"); 
+    
+        while(0x1 & __readMemory32(0x4002200C,"Memory"));  
+    
+        __writeMemory32(0x00000210, 0x40022010, "Memory"); 
+        __writeMemory16(0xFF00, 0x1FFFF800, "Memory");     
+    
+        while(0x1 & __readMemory32(0x4002200C,"Memory")); 
+    
+        __writeMemory32(0x00002000, 0x40022010, "Memory"); 
+    
+        __hwReset(0);
+  
+    }
+    else
+    {
+        __message "Readout protection have been set";
+    }
+  
+}
+
+
+Disable_readProtection()
+{
+
+    if ((0x2 & __readMemory32(0x4002201C,"Memory")) != 0)
+    {
+  
+        __message "Reset readout protection";
+    
+        __writeMemory32(0x00000220, 0x40022010, "Memory"); 
+        __writeMemory32(0x00000260, 0x40022010, "Memory"); 
+    
+        while(0x1 & __readMemory32(0x4002200C,"Memory"));  
+    
+        __writeMemory32(0x00000210, 0x40022010, "Memory"); 
+        __writeMemory16(0x5AA5, 0x1FFFF800, "Memory");
+    
+        while(0x1 & __readMemory32(0x4002200C,"Memory"))
+        {
+    
+            __delay(100);
+    
+        }
+    
+        __writeMemory32(0x00002000, 0x40022010, "Memory");
+    
+        __hwReset(0);
+  
+    }
+    else
+    {
+        __message "Readout protection have been reset";
+    }
+  
+}
+
+
+Enable_readProtectionL2()
+{
+    if ((0x2 & __readMemory32(0x4002201C,"Memory")) == 0)
+    {
+  
+        Enable_set_OptionBytes();
+    
+        __message "Set readout protection L2";
+    
+        __writeMemory32(0x00000220, 0x40022010, "Memory"); 
+        __writeMemory32(0x00000260, 0x40022010, "Memory"); 
+    
+        while(0x1 & __readMemory32(0x4002200C,"Memory"));  
+    
+        __writeMemory32(0x00000210, 0x40022010, "Memory"); 
+        __writeMemory16(0x33CC, 0x1FFFF810, "Memory");     
+    
+        while(0x1 & __readMemory32(0x4002200C,"Memory")); 
+    
+        __writeMemory32(0x00002000, 0x40022010, "Memory"); 
+    
+        __hwReset(0);
+  
+    }
+    else
+    {
+        __message "Readout protection L2 have been set";
+    }
+  
+}
+
+
+getPersistentMacros()   
+{
+    __message "getPersistentMacros";
+    __var macros;
+  
+    macros = "Flash_unlock()";
+    macros += ";Flash_lock()";
+    macros += ";Disable_readProtection()";
+    macros += ";Enable_readProtection()";
+    macros += ";Enable_set_OptionBytes()";
+  
+    return macros;
+}

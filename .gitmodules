@@ -1,0 +1,3 @@
+[submodule "Ghidra_plugin/SVD-Loader-Ghidra"]
+	path = Ghidra_plugin/SVD-Loader-Ghidra
+	url = https://github.com/leveldown-security/SVD-Loader-Ghidra.git

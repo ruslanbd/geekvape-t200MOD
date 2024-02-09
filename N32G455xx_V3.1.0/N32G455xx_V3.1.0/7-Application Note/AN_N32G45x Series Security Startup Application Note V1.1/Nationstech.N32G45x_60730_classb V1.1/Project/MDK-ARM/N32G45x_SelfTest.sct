@@ -1,0 +1,47 @@
+; ****************************************************************
+; Scatter-Loading Description File for IEC 60335 compliant project
+; ****************************************************************
+; WARNING: Class B variables and their inverse redundant parts
+; must be manually placed using the __at attributes in the 
+; n32g45x_SelfTest_classBvar.h file.
+; The start address of CLASSB, CLASSB_INV and RW_IRAM1 region 
+; must be manually modified to be in-line with this file.
+
+  LR_IROM1 0x08000000 0x00100000  {    ; load region size_region
+    ER_IROM1 0x08000000 0x00100000  {  ; load address = execution address
+      *.o (RESET, +First)
+      *(InRoot$$Sections)
+      .ANY (+RO)
+    }
+	
+    RAM_BUF 0x20000004 
+    {			; Run-time transparent RAM test buffer
+      n32g45x_STLstartup.o (RUN_TIME_RAM_BUF)
+    }
+
+    RAM_PNT 0x20000030	
+    {			; Run-time transparent RAM test pointer
+      n32g45x_STLstartup.o (RUN_TIME_RAM_PNT)
+    }
+
+    CLASSB 0x20000040 UNINIT
+    {		        ; Class B variables
+    n32g45x_STLstartup.o (CLASS_B_RAM)
+    }
+
+    CLASSB_INV 0x200000A0 UNINIT 
+    {              ; Class B inverted variables
+    n32g45x_STLstartup.o (CLASS_B_RAM_REV)
+    }
+
+    RW_IRAM1 0x20000100 UNINIT 0x00001F00
+    {     ; RW data (Class A variables)
+      .ANY (+RW +ZI)
+    }
+    
+    STACK_NO_HEAP 0x20001F04 UNINIT 0x1515  { ; Stack and magic pattern for stack overflow detection
+   	  n32g45x_STLstartup.o (STACK_BOTTOM)
+	  startup_n32g45x.o (STACK, +Last)
+    }
+	
+  }

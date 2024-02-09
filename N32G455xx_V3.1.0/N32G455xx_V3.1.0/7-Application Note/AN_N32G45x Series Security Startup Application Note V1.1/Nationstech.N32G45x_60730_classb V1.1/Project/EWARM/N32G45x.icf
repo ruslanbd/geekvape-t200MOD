@@ -1,0 +1,71 @@
+/*###ICF### Section handled by ICF editor, don't touch! ****/
+/*-Editor annotation file-*/
+/* IcfEditorFile="$TOOLKIT_DIR$\config\ide\IcfEditor\cortex_v1_0.xml" */
+/*-Specials-*/
+define symbol __ICFEDIT_intvec_start__ = 0x08000000;
+/*-Memory Regions-*/
+define symbol __ICFEDIT_region_ROM_start__ = 0x08000000;
+define symbol __ICFEDIT_region_ROM_end__   = 0x0801FF03;  /* Modify according to needs,Contains crc results */
+define symbol __ICFEDIT_region_RAM_start__ = 0x20000100;
+define symbol __ICFEDIT_region_RAM_end__   = 0x20013FFF;  /* Modify according to needs */
+
+define symbol __ICFEDIT_region_CLASSB_start__ = 0x20000040;
+define symbol __ICFEDIT_region_CLASSB_end__   = 0x20000100;
+
+/*-Sizes-*/
+define symbol __ICFEDIT_size_cstack__ = 0x400;
+define symbol __ICFEDIT_size_heap__   = 0;
+define symbol __ICFEDIT_size_stack_bottom__ = 0x10;
+/**** End of ICF editor section. ###ICF###*/
+
+export symbol  __ICFEDIT_region_ROM_start__;
+export symbol __ICFEDIT_region_ROM_end__;
+export symbol __ICFEDIT_region_RAM_start__;
+export symbol  __ICFEDIT_region_RAM_end__;
+export symbol  __ICFEDIT_region_CLASSB_start__;
+export symbol  __ICFEDIT_region_CLASSB_end__;
+define memory mem with size = 4G;
+define region ROM_region   = mem:[from __ICFEDIT_region_ROM_start__   to __ICFEDIT_region_ROM_end__];
+define region RAM_region   = mem:[from __ICFEDIT_region_RAM_start__   to __ICFEDIT_region_RAM_end__];
+
+
+define symbol __region_RUN_TIME_RAM_BUF_start__  = 0x20000004;
+define symbol __region_RUN_TIME_RAM_PNT__satrt__ = 0x20000030;
+
+define symbol __region_CLASS_B_RAM_start__  = 0x20000040;
+define symbol __region_CLASS_B_RAM_REV__satrt__   = 0x20000040;
+
+
+define region RUN_TIME_RAM_BUF_region = mem:[from __region_RUN_TIME_RAM_BUF_start__ to 0x2000002F];
+define region RUN_TIME_RAM_PNT_region = mem:[from __region_RUN_TIME_RAM_PNT__satrt__ to 0x2000003F];
+
+define region CLASS_B_RAM_region = mem:[from __region_CLASS_B_RAM_start__ to __ICFEDIT_region_CLASSB_end__];
+define region CLASS_B_RAM_REV_region = mem:[from __region_CLASS_B_RAM_REV__satrt__ to __ICFEDIT_region_CLASSB_end__];
+
+
+define block CSTACK    with alignment = 8, size = __ICFEDIT_size_cstack__   { };
+define block HEAP      with alignment = 8, size = __ICFEDIT_size_heap__     { };
+define block STACK_BOTTOM_B  with alignment = 8, size = __ICFEDIT_size_stack_bottom__  { section STACK_BOTTOM };
+define block stack_order with fixed order { block STACK_BOTTOM_B, block CSTACK, block HEAP };
+
+initialize by copy { readwrite };
+do not initialize  { section .noinit, section STACK_BOTTOM, section RUN_TIME_RAM_BUF, section RUN_TIME_RAM_PNT,
+                     section CLASS_B_RAM, section CLASS_B_RAM_REV};
+
+place at address mem:__ICFEDIT_intvec_start__ { readonly section .intvec };
+
+place in CLASS_B_RAM_region
+                      { readwrite data section CLASS_B_RAM  };
+                     
+place in CLASS_B_RAM_REV_region
+                      { readwrite data section CLASS_B_RAM_REV  };
+
+place in RUN_TIME_RAM_BUF_region
+                      { readwrite data section RUN_TIME_RAM_BUF  };
+
+place in RUN_TIME_RAM_PNT_region
+                      { readwrite data section RUN_TIME_RAM_PNT  };             
+
+place in ROM_region   { readonly };
+place at end of ROM_region { ro section .checksum };
+place at end of RAM_region { readwrite, block stack_order };

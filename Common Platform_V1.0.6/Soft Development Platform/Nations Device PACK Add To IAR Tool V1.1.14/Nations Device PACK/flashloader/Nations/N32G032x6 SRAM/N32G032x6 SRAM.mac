@@ -1,0 +1,18 @@
+__var IWDG_PR;
+__var IWDG_RLR;
+
+execUserFlashInit()
+{
+
+}
+
+execUserFlashExit()
+{
+  if(!(0x4 & __readMemory32(0x4002201C,"Memory")))
+  {
+    __writeMemory32(0x5555,0x40003000,"Memory");
+    __writeMemory32(IWDG_PR,0x40003004,"Memory");
+    __writeMemory32(IWDG_RLR,0x40003008,"Memory");
+    __writeMemory32(0xAAAA,0x40003000,"Memory");
+  }
+}

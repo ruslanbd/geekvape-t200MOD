@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<flash_device>
+  <exe>$TOOLKIT_DIR$\config\flashloader\Nations\N32G435x8\N32G435G8RAM16K.out</exe>
+  <page>2</page>
+  <block>32 0x800</block>
+  <flash_base>0x08000000</flash_base>
+  <macro>$TOOLKIT_DIR$\config\flashloader\Nations\N32G435x8\N32G435G8.mac</macro>
+  <online>1</online>
+  <aggregate>1</aggregate>
+  <args_doc>"--skip_erase" -Don't erase blocks that read empty.</args_doc>
+</flash_device>
