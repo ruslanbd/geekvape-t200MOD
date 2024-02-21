@@ -7,6 +7,8 @@ Firmware dumped though the swd testpoints on the pcb.
 
 Extrenal 32mb flash chip (GD25Q256E) dump: outspi.bin
 
+Couldn't find a way to dump the flash without unsoldering, but hopefully I will find a way to do so soon.
+
 Full documentation on the N32G455 chip is in respective folders. Obtained from ftp://download.nationstech.com/, with anonymous login (anonynous:anonymous). Use the default linux command line ftp, all other ftp browsers I used couldn't connect for some reason.
 
 This is a very raw and work-in-progress repo. Use at your own risk. I may be accessible through issues, but I might not be able to help you.
